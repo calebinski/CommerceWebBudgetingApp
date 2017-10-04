@@ -1,0 +1,218 @@
+CREATE TABLE [dbo].[Users]
+(
+	[UserID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [FirstName] VARCHAR(30) NOT NULL, 
+    [LastName] VARCHAR(30) NOT NULL, 
+    [Username] VARCHAR(50) NOT NULL UNIQUE, 
+    [Password] VARCHAR(50) NOT NULL,
+    [Email] VARCHAR(100) NULL,
+    [GoalsNotifications] BIT NOT NULL DEFAULT 0,
+    [BudgetsNotifications] BIT NOT NULL DEFAULT 0
+    [EmailNotifications] BIT DEFAULT ((0)) NOT NULL,
+    [TextNotifications] BIT DEFAULT ((0)) NOT NULL,
+    [Phone] varchar(15) NULL
+)
+
+CREATE TABLE [dbo].[Categories]
+(
+	[CategoryID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] VARCHAR(30) NOT NULL UNIQUE,
+    [UserID] INT NOT NULL,
+    CONSTRAINT [FK_Categories_Users] FOREIGN KEY ([UserID]) REFERENCES [Users]([UserID]) 
+)
+
+CREATE TABLE [dbo].[Accounts]
+(
+	[AcctNumber] BIGINT NOT NULL PRIMARY KEY, 
+    [UserID] INT NOT NULL, 
+    [Balance] MONEY NOT NULL,
+    [AccountType] VARCHAR(30) NOT NULL,
+    CONSTRAINT [FK_Accounts_Users] FOREIGN KEY ([UserID]) REFERENCES [Users]([UserID])
+)
+
+CREATE TABLE [dbo].[Transactions]
+(
+	[TransactionID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [AcctNumber] BIGINT NOT NULL,
+    [CategoryID] INT NOT NULL, 
+    [DepositType] CHAR(5) NOT NULL,
+    [Deposit] MONEY NOT NULL,
+    [Description] VARCHAR(250) NOT NULL,
+    [TransDate] DATE NOT NULL,
+    [TransType] VARCHAR(10) NOT NULL,
+    CONSTRAINT [FK_Transactions_Accounts] FOREIGN KEY ([AcctNumber]) REFERENCES [Accounts]([AcctNumber]),
+    CONSTRAINT [FK_Transactions_Categories] FOREIGN KEY ([CategoryID]) REFERENCES [Categories]([CategoryID])
+)
+
+CREATE TABLE [dbo].[Goals]
+(
+	[GoalID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [AcctNumber] BIGINT NOT NULL,
+    [Name] VARCHAR(75) NOT NULL, 
+    [CurrentAmt] MONEY NOT NULL,
+    [TotalAmt] MONEY NOT NULL,
+    [StartDate] DATE NOT NULL,
+    [EndDate] DATE NOT NULL,
+    [Completed] BIT NOT NULL, 
+    [TransferType] VARCHAR(30) NOT NULL,
+    [TransferAmt] DECIMAL NOT NULL,
+    [Description] VARCHAR(75) NOT NULL,
+    [Favorite] BIT NULL,
+    [NotificationCount] TINYINT NOT NULL DEFAULT 0,
+    CONSTRAINT [FK_Goals_Accounts] FOREIGN KEY ([AcctNumber]) REFERENCES [Accounts]([AcctNumber])
+)
+
+CREATE TABLE [dbo].[GoalTransactions]
+(
+	[GoalTransID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [GoalID] INT NOT NULL, 
+    [AcctNumber] BIGINT NOT NULL,
+    [Deposit] MONEY NOT NULL,
+    [TransDate] DATE NOT NULL,
+    CONSTRAINT [FK_GoalTransactions_Accounts] FOREIGN KEY ([AcctNumber]) REFERENCES [Accounts]([AcctNumber]),
+    CONSTRAINT [FK_GoalTransactions_Goals] FOREIGN KEY ([GoalID]) REFERENCES [Goals]([GoalID])
+)
+
+CREATE TABLE [dbo].[Budgets]
+(
+	[BudgetID] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CategoryID] INT NOT NULL,  
+    [AcctNumber] BIGINT NOT NULL,
+    [StartDate] DATE NOT NULL,
+    [EndDate] DATE NOT NULL,
+    [MaxAmt] MONEY NOT NULL,
+    [Completed] BIT NOT NULL, 
+    [Failed] BIT NOT NULL,
+    [Favorite] BIT NULL,
+    [CurrentAmt] MONEY NOT NULL,
+    [NotificationCount] TINYINT NOT NULL DEFAULT 0,
+    CONSTRAINT [FK_Budgets_Accounts] FOREIGN KEY ([AcctNumber]) REFERENCES [Accounts]([AcctNumber]),
+    CONSTRAINT [FK_Budgets_Categories] FOREIGN KEY ([CategoryID]) REFERENCES [Categories]([CategoryID])
+)
+
+CREATE TABLE [dbo].[GameAccounts]
+(
+	[GameAcctID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [UserID] INT NOT NULL, 
+    [RewardPoints] INT NOT NULL,
+    [BackgroundImage] VARCHAR(25) NOT NULL,
+    [CurPopulation] SMALLINT NOT NULL,
+    [CurFood] SMALLINT NOT NULL,
+    [CurWood] SMALLINT NOT NULL,
+    [CurMetal] SMALLINT NOT NULL,
+    [CurTools] SMALLINT NOT NULL,
+    [CharImage] VARCHAR(25) NOT NULL,
+    [CharTitle] VARCHAR(50) NOT NULL,
+    CONSTRAINT [FK_GameAccounts_Users] FOREIGN KEY ([UserID]) REFERENCES [Users]([UserID])
+)
+
+CREATE TABLE [dbo].[PointTransactions]
+(
+	[PointTransID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [GameAcctID] INT NOT NULL, 
+    [PointTransDesc] VARCHAR(50) NOT NULL,
+    [TransDate] DATE NOT NULL,
+    [TransType] VARCHAR(10) NOT NULL,
+    [PointsAmount] INT NOT NULL,
+    CONSTRAINT [FK_PointTransactions_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID])
+)
+
+CREATE TABLE [dbo].[ResourceTrans]
+(
+	[ResTransID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [GameAcctID] INT NOT NULL, 
+    [ResTransDesc] VARCHAR(50) NOT NULL,
+    [TransDate] DATE NOT NULL,
+    [ResourceType] VARCHAR(25) NOT NULL,
+    [TransType] VARCHAR(10) NOT NULL,
+    [ResourceAmount] INT NOT NULL,
+    CONSTRAINT [FK_ResourceTrans_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID])
+)
+
+CREATE TABLE [dbo].[Awards]
+(
+	[AwardID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [AwardName] VARCHAR(50) NOT NULL,
+    [AwardDesc] TEXT NOT NULL,
+    [RewardAmount] INT NOT NULL,
+)
+
+CREATE TABLE [dbo].[GameAwards]
+(
+	[GameAwardID] INT NOT NULL PRIMARY KEY IDENTITY,
+    [GameAcctID] INT NOT NULL,
+    [AwardID] INT NOT NULL,
+    CONSTRAINT [FK_GameAwards_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID]),
+    CONSTRAINT [FK_GameAwards_Awards] FOREIGN KEY ([AwardID]) REFERENCES [Awards]([AwardID])
+)
+
+CREATE TABLE [dbo].[Rewards]
+(
+	[RewardID] INT NOT NULL PRIMARY KEY IDENTITY,
+	[RewardName] VARCHAR(50) NOT NULL,
+    [RewardDesc] TEXT NOT NULL,
+    [PointCost] INT NOT NULL,
+	[RewardType] VARCHAR(25) NOT NULL,
+    [RewardImage] VARCHAR(25) NOT NULL,
+    [RewardTier] INT NOT NULL,
+)
+
+CREATE TABLE [dbo].[OwnedRewards]
+(
+	[OwnedRewardID] INT NOT NULL PRIMARY KEY IDENTITY,
+    [GameAcctID] INT NOT NULL,
+    [RewardID] INT NOT NULL,
+	[ObtainedDate] DATE NOT NULL,
+    CONSTRAINT [FK_OwnedRewards_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID]),
+    CONSTRAINT [FK_OwnedRewards_Quests] FOREIGN KEY ([RewardID]) REFERENCES [Rewards]([RewardID])
+)
+
+CREATE TABLE [dbo].[Quests]
+(
+	[QuestID] INT NOT NULL PRIMARY KEY IDENTITY,
+	[QuestName] VARCHAR(50) NOT NULL,
+    [QuestDesc] TEXT NOT NULL,
+	[RewardType] VARCHAR(25) NOT NULL,
+    [RewardAmount] INT NOT NULL,
+	[CompletionTime] TIME NOT NULL,
+	[PopulationCost] SMALLINT NOT NULL,
+    [FoodCost] SMALLINT NOT NULL,
+    [WoodCost] SMALLINT NOT NULL,
+    [MetalCost] SMALLINT NOT NULL,
+    [ToolsCost] SMALLINT NOT NULL,
+)
+
+CREATE TABLE [dbo].[TakenQuests]
+(
+	[TakenQuestID] INT NOT NULL PRIMARY KEY IDENTITY,
+    [GameAcctID] INT NOT NULL,
+    [QuestID] INT NOT NULL,
+	[TakenDate] DATE NOT NULL,
+	[CompletedDate] DATE,
+    CONSTRAINT [FK_TakenQuests_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID]),
+    CONSTRAINT [FK_TakenQuests_Quests] FOREIGN KEY ([QuestID]) REFERENCES [Quests]([QuestID])
+)
+
+CREATE TABLE [dbo].[Buildings]
+(
+	[BuildingID] INT NOT NULL PRIMARY KEY IDENTITY,
+	[BuildingName] VARCHAR(50) NOT NULL,
+    [BuildingDesc] TEXT NOT NULL,
+	[DefaultImage] VARCHAR(25) NOT NULL,
+	[PopulationCost] SMALLINT NOT NULL,
+    [FoodCost] SMALLINT NOT NULL,
+    [WoodCost] SMALLINT NOT NULL,
+    [MetalCost] SMALLINT NOT NULL,
+    [ToolsCost] SMALLINT NOT NULL,
+)
+
+CREATE TABLE [dbo].[GameData]
+(
+	[GameDataID] INT NOT NULL PRIMARY KEY IDENTITY,
+    [GameAcctID] INT NOT NULL,
+    [BuildingID] INT NOT NULL,
+	[BuildingLevel] TINYINT NOT NULL,
+	[BuildingImage] VARCHAR(50) NOT NULL,
+    CONSTRAINT [FK_GameData_GameAccounts] FOREIGN KEY ([GameAcctID]) REFERENCES [GameAccounts]([GameAcctID]),
+    CONSTRAINT [FK_GameData_Buildings] FOREIGN KEY ([BuildingID]) REFERENCES [Buildings]([BuildingID])
+)

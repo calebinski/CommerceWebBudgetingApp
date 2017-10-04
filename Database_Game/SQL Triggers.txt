@@ -1,0 +1,26 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		N. King
+-- Create date: 4/24/2017
+-- Description:	updated completed column when goal is met
+-- =============================================
+CREATE OR ALTER TRIGGER  trg_completed
+   ON  Goals
+   AFTER UPDATE
+AS 
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	IF UPDATE (CurrentAmt)
+	BEGIN
+
+		UPDATE Goals SET Completed = 1 WHERE CurrentAmt >= TotalAmt 
+	
+	END
+END
+GO

@@ -1,0 +1,9 @@
+First you will need to have a version of SQL Server installed
+Then you will need to adjust your connectionString, it is placed in the Web.config file
+
+If you can connect to the database from Visual Studio, find your database and right-click to
+	add a table, then insert the table creation sql (located in an accompanying file)
+	statements one at a time and run them.
+
+Once the tables are made, create a user and a category, there are commands in the Data Abstraction
+layer that can do that.
