@@ -1,0 +1,31 @@
+/* Game */
+#char-display {
+    height: 200px;
+    width: 200px;
+}
+
+#char-name {
+    font-family: 'Times New Roman';
+    font: italic;
+}
+
+.game-fullscreen img {
+    float: left;
+    width: 550px;
+    height: 563px;
+}
+
+#info-display {
+    width: 250px;
+    margin: 10px;
+}
+
+#village-info {
+    width: 200px;
+}
+
+#village-info span {
+    text-align: center;
+    padding: 5px 10px;
+    margin: 5px 10px;
+}

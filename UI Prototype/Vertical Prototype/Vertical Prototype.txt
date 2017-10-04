@@ -1,0 +1,2 @@
+The current progress made on the Goals.aspx page and it's backend is our vertical prototype.
+The Unified Project folder contains the complete vertical prototype, but it is redundant to have two copies in the repository.

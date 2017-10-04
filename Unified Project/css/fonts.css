@@ -1,0 +1,21 @@
+/*An open source license for the following fonts can be viewed in the same directory as the specified font files.*/
+
+@font-face {
+	font-family: RalewayRegular;
+	src: url(../fonts/Raleway-Regular.ttf);
+}
+
+@font-face {
+	font-family: RalewayLight;
+	src: url(../fonts/Raleway-Light.ttf);
+}
+
+@font-face {
+	font-family: RalewayExtraLight;
+	src: url(../fonts/Raleway-ExtraLight.ttf)
+}
+
+@font-face {
+	font-family: RalewayThin;
+	src: url(../fonts/Raleway-Thin.ttf);
+}
